@@ -1,11 +1,12 @@
 import yaml
+import os
 
 
 class Metagraph:
     node_types, relationship_types = {}, {}
 
     def __init__(self):
-        with open("metagraph.yaml", 'r') as stream:
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "metagraph.yaml"), 'r') as stream:
             try:
                 data = yaml.load(stream)
                 self.node_types = data['node_types']
