@@ -1,0 +1,126 @@
+node_types:
+  # description
+  anatomical_entity:
+    name: anatomical_entity
+  # description
+  biological_process:
+    name: biological_process
+  # description
+  cellular_component:
+    name: cellular_component
+  # description
+  chemical_substance:
+    name: chemical_substance
+  # description
+  disease:
+    name: disease
+  # description
+  metabolite:
+    name: metabolite
+  # description
+  microRNA:
+    name: microRNA
+  # description
+  molecular_function:
+    name: molecular_function
+  # description
+  pathway:
+    name: pathway
+  # description
+  phenotypic_feature:
+    name: phenotypic_feature
+  # description
+  protein:
+    name: protein
+
+relationship_types:
+  # description
+  affects:
+    name: affects
+    nodes:
+      - {source: phenotypic_feature, target: anatomical_entity}
+      - {source: disease, target: biological_process}
+      - {source: disease, target: cellular_component}
+  # description
+  capable_of:
+    name: capable_of
+    nodes:
+      - {source: anatomical_entity, target: biological_process}
+  # description
+  contraindicated_for:
+    name: contraindicated_for
+    nodes:
+      - {source: chemical_substance, target: disease}
+      - {source: chemical_substance, target: phenotypic_feature}
+  # description
+  expressed_in:
+    name: expressed_in
+    nodes:
+      - {source: microRNA, target: anatomical_entity}
+      - {source: protein, target: anatomical_entity}
+  # description
+  gene_associated_with_condition:
+    name: gene_associated_with_condition
+    nodes:
+      - {source: microRNA, target: disease}
+      - {source: protein, target: disease}
+  # description
+  gene_mutations_contribute_to:
+    name: gene_mutations_contribute_to
+    nodes:
+      - {source: microRNA, target: disease}
+      - {source: protein, target: disease}
+  # description
+  has_part:
+    name: has_part
+    nodes:
+      - {source: anatomical_entity, target: cellular_component}
+  # description
+  has_phenotype:
+    name: has_phenotype
+    nodes:
+      - {source: microRNA, target: phenotypic_feature}
+      - {source: protein, target: phenotypic_feature}
+      - {source: disease, target: phenotypic_feature}
+  # description
+  indicated_for:
+    name: indicated_for
+    nodes:
+      - {source: chemical_substance, target: disease}
+      - {source: chemical_substance, target: phenotypic_feature}
+  # description
+  involved_in:
+    name: involved_in
+    nodes:
+      - {source: protein, target: biological_process}
+      - {source: microRNA, target: biological_process}
+  # description
+  participates_in:
+    name: participates_in
+    nodes:
+      - {source: protein, target: pathway}
+  # description
+  physically_interacts_with:
+    name: physically_interacts_with
+    nodes:
+      - {source: metabolite, target: protein}
+      - {source: chemical_substance, target: protein}
+      - {source: protein, target: protein}
+  # description
+  regulates:
+    name: regulates
+    nodes:
+      - {source: protein, target: protein}
+      - {source: microRNA , target: protein}
+      - {source: microRNA, target: microRNA}
+  # description
+  subclass_of:
+    name: subclass_of
+    nodes:
+      - {source: phenotypic_feature, target: phenotypic_feature}
+      - {source: biological_process, target: biological_process}
+      - {source: disease, target: disease}
+      - {source: cellular_component, target: cellular_component}
+      - {source: molecular_function, target: cellular_component}
+
+
