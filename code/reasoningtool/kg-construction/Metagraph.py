@@ -27,11 +27,11 @@ class Metagraph:
         else:
             return None
 
-    def get_nodes_predicate(self, node_type):
+    def get_nodes_GO_molec_predicate(self, node_type):
         if node_type in self.node_types.keys():
-            return self.node_types[node_type]['predicate']
-        else:
-            return None
+            if 'GO_molec_predicate' in self.node_types[node_type]:
+                return self.node_types[node_type]['GO_molec_predicate']
+        return None
 
     #   relationship types
     def get_relation_name(self, relation_type):
@@ -56,14 +56,15 @@ class Metagraph:
 
 if __name__ == '__main__':
     mg = Metagraph()
+
     #   node types
     print(mg.get_nodes_name('anatomical_entity'))
     print(mg.get_nodes_curie_prefix('anatomical_entity'))
-    print(mg.get_nodes_predicate('anatomical_entity'))
+    print(mg.get_nodes_GO_molec_predicate('anatomical_entity'))
 
     print(mg.get_nodes_name('biological_process'))
     print(mg.get_nodes_curie_prefix('biological_process'))
-    print(mg.get_nodes_predicate('biological_process'))
+    print(mg.get_nodes_GO_molec_predicate('biological_process'))
 
     #   relationship type
     print(mg.get_relation_name('affects'))
