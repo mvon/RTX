@@ -2,41 +2,64 @@ node_types:
   # description
   anatomical_entity:
     name: anatomical_entity
+    curie_prefix: UBERON
+    predicate: None
   # description
   biological_process:
     name: biological_process
+    curie_prefix: GO
+    predicate: involved_in
   # description
   cellular_component:
     name: cellular_component
+    curie_prefix: GO
+    predicate: expressed_in
   # description
   chemical_substance:
     name: chemical_substance
+    curie_prefix: CHEMBL.COMPOUND
+    predicate:
   # description
   disease:
     name: disease
+    curie_prefix: DOID
+    predicate:
   # description
   metabolite:
     name: metabolite
+    curie_prefix: KEGG
+    predicate:
   # description
   microRNA:
     name: microRNA
+    curie_prefix: NCBIGene
+    predicate:
   # description
   molecular_function:
     name: molecular_function
+    curie_prefix: GO
+    predicate: capable_of
   # description
   pathway:
     name: pathway
+    curie_prefix: REACT
+    predicate:
   # description
   phenotypic_feature:
     name: phenotypic_feature
+    curie_prefix: HP
+    predicate:
   # description
   protein:
     name: protein
+    curie_prefix: UniProtKB
+    predicate:
 
 relationship_types:
   # description
   affects:
     name: affects
+    is_directed: True
     nodes:
       - {source: phenotypic_feature, target: anatomical_entity}
       - {source: disease, target: biological_process}
@@ -44,40 +67,47 @@ relationship_types:
   # description
   capable_of:
     name: capable_of
+    is_directed: True
     nodes:
       - {source: anatomical_entity, target: biological_process}
   # description
   contraindicated_for:
     name: contraindicated_for
+    is_directed: True
     nodes:
       - {source: chemical_substance, target: disease}
       - {source: chemical_substance, target: phenotypic_feature}
   # description
   expressed_in:
     name: expressed_in
+    is_directed: True
     nodes:
       - {source: microRNA, target: anatomical_entity}
       - {source: protein, target: anatomical_entity}
   # description
   gene_associated_with_condition:
     name: gene_associated_with_condition
+    is_directed: True
     nodes:
       - {source: microRNA, target: disease}
       - {source: protein, target: disease}
   # description
   gene_mutations_contribute_to:
     name: gene_mutations_contribute_to
+    is_directed: True
     nodes:
       - {source: microRNA, target: disease}
       - {source: protein, target: disease}
   # description
   has_part:
     name: has_part
+    is_directed: True
     nodes:
       - {source: anatomical_entity, target: cellular_component}
   # description
   has_phenotype:
     name: has_phenotype
+    is_directed: True
     nodes:
       - {source: microRNA, target: phenotypic_feature}
       - {source: protein, target: phenotypic_feature}
@@ -85,23 +115,27 @@ relationship_types:
   # description
   indicated_for:
     name: indicated_for
+    is_directed: True
     nodes:
       - {source: chemical_substance, target: disease}
       - {source: chemical_substance, target: phenotypic_feature}
   # description
   involved_in:
     name: involved_in
+    is_directed: True
     nodes:
       - {source: protein, target: biological_process}
       - {source: microRNA, target: biological_process}
   # description
   participates_in:
     name: participates_in
+    is_directed: True
     nodes:
       - {source: protein, target: pathway}
   # description
   physically_interacts_with:
     name: physically_interacts_with
+    is_directed: False
     nodes:
       - {source: metabolite, target: protein}
       - {source: chemical_substance, target: protein}
@@ -109,6 +143,7 @@ relationship_types:
   # description
   regulates:
     name: regulates
+    is_directed: True
     nodes:
       - {source: protein, target: protein}
       - {source: microRNA , target: protein}
@@ -116,11 +151,12 @@ relationship_types:
   # description
   subclass_of:
     name: subclass_of
+    is_directed: True
     nodes:
       - {source: phenotypic_feature, target: phenotypic_feature}
       - {source: biological_process, target: biological_process}
       - {source: disease, target: disease}
       - {source: cellular_component, target: cellular_component}
-      - {source: molecular_function, target: cellular_component}
+      - {source: molecular_function, target: molecular_function}
 
 
