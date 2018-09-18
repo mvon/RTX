@@ -490,6 +490,20 @@ def return_subgraph_paths_of_type(source_node, source_node_label, target_node, t
     :param debug: Flag indicating if the cypher query should be returned
     :return: networkx graph
     """
+    if type(source_node) == list:
+        source_node = str(source_node)
+        source_char = " in "
+    elif type(source_node) == str:
+        source_node = "'"+source_node+"'"
+        source_char = "="
+    if type(target_node) == list:
+        target_node = str(target_node)
+        target_char = " in "
+    elif type(target_node) == str:
+        target_node = "'"+target_node+"'"
+        target_char = "="
+    else:
+        target_char = "="
     if not any(isinstance(el, list) for el in relationship_list):  # It's a single list of relationships
         if directed:
             if target_node is not None:
@@ -497,14 +511,14 @@ def return_subgraph_paths_of_type(source_node, source_node_label, target_node, t
                 for i in range(len(relationship_list) - 1):
                     query += "[:" + relationship_list[i] + "]->()-"
                 query += "[:" + relationship_list[-1] + "]->" + "(t:%s) " % target_node_label
-                query += "WHERE s.id='%s' and t.id='%s' " % (source_node, target_node)
+                query += "WHERE s.id%s%s and t.id%s%s " % (source_char, source_node, target_char, target_node)
                 query += "RETURN path"
             else:
                 query = "MATCH path=(s:%s)-" % source_node_label
                 for i in range(len(relationship_list) - 1):
                     query += "[:" + relationship_list[i] + "]->()-"
                 query += "[:" + relationship_list[-1] + "]->" + "(t:%s) " % target_node_label
-                query += "WHERE s.id='%s'" % (source_node)
+                query += "WHERE s.id%s%s " % (source_char, source_node)
                 query += "RETURN path"
             if debug:
                 return query
@@ -514,27 +528,27 @@ def return_subgraph_paths_of_type(source_node, source_node_label, target_node, t
                 for i in range(len(relationship_list) - 1):
                     query += "[:" + relationship_list[i] + "]-()-"
                 query += "[:" + relationship_list[-1] + "]-" + "(t:%s) " % target_node_label
-                query += "WHERE s.id='%s' and t.id='%s' " % (source_node, target_node)
+                query += "WHERE s.id%s%s and t.id%s%s " % (source_char, source_node, target_char, target_node)
                 query += "RETURN path"
             else:
                 query = "MATCH path=(s:%s)-" % source_node_label
                 for i in range(len(relationship_list) - 1):
                     query += "[:" + relationship_list[i] + "]-()-"
                 query += "[:" + relationship_list[-1] + "]-" + "(t:%s) " % target_node_label
-                query += "WHERE s.id='%s'" % (source_node)
+                query += "WHERE s.id%s%s " % (source_char, source_node)
                 query += "RETURN path"
             if debug:
                 return query
     else:  # it's a list of lists
         if directed:
-            query = "MATCH (s:%s{id:'%s'}) " % (source_node_label, source_node)
+            query = "MATCH (s:%s) " % source_node_label
             for rel_index in range(len(relationship_list)):
                 rel_list = relationship_list[rel_index]
                 query += "OPTIONAL MATCH path%d=(s)-" % rel_index
                 for i in range(len(rel_list) - 1):
                     query += "[:" + rel_list[i] + "]->()-"
                 query += "[:" + rel_list[-1] + "]->" + "(t:%s)" % target_node_label
-                query += " WHERE t.id='%s' " % target_node
+                query += " WHERE s.id%s%s and t.id%s%s " % (source_char, source_node, target_char, target_node)
             query += "RETURN "
             for rel_index in range(len(relationship_list) - 1):
                 query += "collect(path%d)+" % rel_index
@@ -542,14 +556,14 @@ def return_subgraph_paths_of_type(source_node, source_node_label, target_node, t
             if debug:
                 return query
         else:
-            query = "MATCH (s:%s{id:'%s'}) " % (source_node_label, source_node)
+            query = "MATCH (s:%s) " % source_node_label
             for rel_index in range(len(relationship_list)):
                 rel_list = relationship_list[rel_index]
                 query += "OPTIONAL MATCH path%d=(s)-" % rel_index
                 for i in range(len(rel_list) - 1):
                     query += "[:" + rel_list[i] + "]-()-"
                 query += "[:" + rel_list[-1] + "]-" + "(t:%s)" % target_node_label
-                query += " WHERE t.id='%s' " % target_node
+                query += " WHERE s.id%s%s and t.id%s%s " % (source_char, source_node, target_char, target_node)
             query += "RETURN "
             for rel_index in range(len(relationship_list) - 1):
                 query += "collect(path%d)+" % rel_index
