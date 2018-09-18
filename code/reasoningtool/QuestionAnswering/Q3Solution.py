@@ -29,8 +29,36 @@ class Q3:
 		:param use_json: If the answer should be in Eric's Json standardized API output format
 		:return: list of dictionaries containing the nodes that are one hop (along relationship type) that connect source to target.
 		"""
-		# Get label/kind of node the source is
-		source_label = RU.get_node_property(source_name, "label")
+
+		# Test if list, if so, turn into list
+		if source_name[0]=='[':
+			source_name_preserved = source_name
+			
+			try:
+				source_name = source_name.replace(",", "','").replace("[", "['").replace("]", "']")
+				source_name = ast.literal_eval(source_name)
+				source_name_strip = []
+				for source in source_name:
+					source_name_strip.append(source.strip())
+
+				source_name = source_name_strip
+
+			except:
+				source_name = eval(source_name_preserved)
+		# Get label/kind of node the source is, check for consistency of source type in list
+		
+		source_consistency_test = []
+		for source in source_name:
+			source_consistency_test.append(RU.get_node_property(source, "label"))
+		source_consistency_test = list(set(source_consistency_test))
+		if len(source_consistency_test) > 1:
+			error_message = "More than one node type in input"
+			error_code = "MultipleTypesInput"
+			response = FormatOutput.FormatResponse(3)
+			response.add_error_message(error_code, error_message)
+			return response
+		
+		source_label = source_consistency_test[0]
 
 		# Get the subgraph (all targets along relationship)
 		has_intermediate_node = False
@@ -48,20 +76,23 @@ class Q3:
 				return response
 
 		# extract the source_node_number
+		
+		source_node_number = []
 		for node, data in g.nodes(data=True):
-			if data['properties']['id'] == source_name:
-				source_node_number = node
-				break
+			if data['properties']['id'] in source_name:
+				source_node_number.append(node)
 
 		# Get all the target numbers
 		target_numbers = []
 		for node, data in g.nodes(data=True):
-			if data['properties']['id'] != source_name:
+			if data['properties']['id'] not in source_name:
 				target_numbers.append(node)
 
 		# if there's an intermediate node, get the name
 		if has_intermediate_node:
-			neighbors = list(g.neighbors(source_node_number))
+			neighbors = []
+			for node in source_node_number:
+				neighbors.append(list(g.neighbors(source_node_number)))
 			if len(neighbors) > 1:
 				error_message = "More than one intermediate node"
 				error_code = "AmbiguousPath"
@@ -86,23 +117,25 @@ class Q3:
 		else:  # You want the standardized API output format
 			response = FormatOutput.FormatResponse(3)  # it's a Q3 question
 			response.response.table_column_names = ["source name", "source ID", "target name", "target ID"]
-			source_description = g.node[source_node_number]['properties']['name']
-			for target_number in target_numbers:
-				target_description = g.node[target_number]['properties']['name']
-				if not has_intermediate_node:
-					subgraph = g.subgraph([source_node_number, target_number])
-				else:
-					subgraph = g.subgraph([source_node_number, intermediate_node, target_number])
-				res = response.add_subgraph(subgraph.nodes(data=True), subgraph.edges(data=True),
-									"%s and %s are connected by the relationship %s" % (
-									source_description, target_description,	relationship_type), 1, return_result=True)
-				res.essence = "%s" % target_description  # populate with essence of question result
-				row_data = []  # initialize the row data
-				row_data.append("%s" % source_description)
-				row_data.append("%s" % g.node[source_node_number]['properties']['id'])
-				row_data.append("%s" % target_description)
-				row_data.append("%s" % g.node[target_number]['properties']['id'])
-				res.row_data = row_data
+			for source in source_node_number:
+				source_description = g.node[source]['properties']['name']
+				for target_number in target_numbers:
+					if g.has_edge(source,target_number):
+						target_description = g.node[target_number]['properties']['name']
+						if not has_intermediate_node:
+							subgraph = g.subgraph([source_node_number, target_number])
+						else:
+							subgraph = g.subgraph([source_node_number, intermediate_node, target_number])
+						res = response.add_subgraph(subgraph.nodes(data=True), subgraph.edges(data=True),
+											"%s and %s are connected by the relationship %s" % (
+											source_description, target_description,	relationship_type), 1, return_result=True)
+						res.essence = "%s" % target_description  # populate with essence of question result
+						row_data = []  # initialize the row data
+						row_data.append("%s" % source_description)
+						row_data.append("%s" % g.node[source_node_number]['properties']['id'])
+						row_data.append("%s" % target_description)
+						row_data.append("%s" % g.node[target_number]['properties']['id'])
+						res.row_data = row_data
 			return response
 
 	def describe(self):
