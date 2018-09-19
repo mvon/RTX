@@ -334,7 +334,12 @@ class Question:
 						if node_label == parameter_name and node != "DOID:4":  # DOID:4 was "disease" which wrecks havoc with things
 							parameter_name_positions.append(pos)
 						pos += 1
-					if len(parameter_name_positions) > 1:
+					if "[" in input_question and "]" in input_question:  # TODO: this is a hack workaround for Q7 lists
+						to_populate = []  # TODO: this is a hack workaround for Q7 lists
+						for pos in parameter_name_positions:  # TODO: this is a hack workaround for Q7 lists
+							to_populate.append(candidate_node_names_labels[pos][0])  # TODO: this is a hack workaround for Q7 lists
+						parameters[parameter_name] = to_populate  # TODO: this is a hack workaround for Q7 lists
+					elif len(parameter_name_positions) > 1:  # TODO: this is a hack workaround for Q7 lists
 						raise CustomExceptions.MultipleTerms(parameter_name, [candidate_node_names_labels[pos][0] for pos in parameter_name_positions])
 					elif len(parameter_name_positions) == 0:
 						pass  # nothing to do, will catch this error later

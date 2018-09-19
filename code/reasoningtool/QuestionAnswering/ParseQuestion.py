@@ -50,20 +50,22 @@ class ParseQuestion:
 		fulfilled = False
 		for ind in sorted_indicies[0:3]:  # only look at the top 3 similar questions
 			question = self._question_templates[ind]
+			print(question.restated_question_template.template)
 			if wd_distances[ind] < 0.25:  # don't even bother with these low quality matches
 				break
-			try:
-				parameters = question.get_parameters(input_question)
-			except CustomExceptions.MultipleTerms as e:  # If you run into an exception, return the error string
-				error_message = "The most similar question I can answer is: " + question.restated_question_template.template
-				error_message += " But I found: " + str(e)
-				error_code = "multiple_terms"
-				return question, {}, error_message, error_code
-			# Otherwise, see if the parameters can be filled
+			#try:
+			parameters = question.get_parameters(input_question)
+			#except CustomExceptions.MultipleTerms as e:  # If you run into an exception, return the error string  # TODO: this is a hack workaround for Q7 lists (uncomment)
+			#	error_message = "The most similar question I can answer is: " + question.restated_question_template.template  # TODO: this is a hack workaround for Q7 lists  (uncomment)
+			#	error_message += " But I found: " + str(e)  # TODO: this is a hack workaround for Q7 lists (uncomment)
+			#	error_code = "multiple_terms"  # TODO: this is a hack workaround for Q7 lists (uncomment)
+			#	return question, {}, error_message, error_code  # TODO: this is a hack workaround for Q7 lists (uncomment)
+			# Otherwise, see if the parameters can be filled  # TODO: this is a hack workaround for Q7 lists  (uncomment)
 			if not parameters and not question.parameter_names:
 				fulfilled = True  # There was nothing to fulfill, so we're good
 				break
-			elif parameters and all([x is not None for x in parameters.values()]):
+			#elif parameters and all([x is not None for x in parameters.values()]):  # TODO: this is a hack workaround for Q7 lists (uncomment)
+			elif parameters and all([x for x in parameters.values()]):
 				fulfilled = True
 				break  # Template parameters can be filled, so stop looking over questions
 

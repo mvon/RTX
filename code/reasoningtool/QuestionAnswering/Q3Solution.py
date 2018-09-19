@@ -10,6 +10,7 @@ except ImportError:
 
 import FormatOutput
 import CustomExceptions
+import ast
 
 # eg: what proteins does drug X target? One hop question
 class Q3:
@@ -31,7 +32,7 @@ class Q3:
 		"""
 
 		# Test if list, if so, turn into list
-		if source_name[0]=='[':
+		if source_name[0] == '[':
 			source_name_preserved = source_name
 			
 			try:

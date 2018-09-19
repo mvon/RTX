@@ -10,6 +10,7 @@ Q4	true	What proteins are in the phenylketonuria pathway?
 Q5	true	What are the phenotypes of Fanconi anemia?
 Q6	false	What micrornas control the expression of G6PD?
 Q7	true	What genes are associated with Fanconi anemia?
+Q7	true	What genes are associated with [DOID:8398,DOID:718]
 Q8	false	What genes are expressed in retina?
 Q9	true	What are the drugs that target PTGS1?
 Q10	true	What proteins are associated with anemia?
