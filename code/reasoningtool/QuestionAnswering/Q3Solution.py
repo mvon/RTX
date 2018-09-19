@@ -1,6 +1,7 @@
 import os
 import sys
 import argparse
+import ast
 # PyCharm doesn't play well with relative imports + python console + terminal
 try:
 	from code.reasoningtool import ReasoningUtilities as RU
@@ -45,7 +46,16 @@ class Q3:
 				source_name = source_name_strip
 
 			except:
-				source_name = eval(source_name_preserved)
+				#source_name = eval(source_name_preserved)
+				source_name = source_name_preserved.replace(",", "','").replace("[", "['").replace("]", "']")
+				source_name = ast.literal_eval(source_name)
+				source_name_strip = []
+				for source in source_name:
+					source_name_strip.append(source.strip())
+
+				source_name = source_name_strip
+		else:
+			source_name = [source_name]
 		# Get label/kind of node the source is, check for consistency of source type in list
 		
 		source_consistency_test = []
@@ -124,16 +134,16 @@ class Q3:
 					if g.has_edge(source,target_number):
 						target_description = g.node[target_number]['properties']['name']
 						if not has_intermediate_node:
-							subgraph = g.subgraph([source_node_number, target_number])
+							subgraph = g.subgraph([source, target_number])
 						else:
-							subgraph = g.subgraph([source_node_number, intermediate_node, target_number])
+							subgraph = g.subgraph([source, intermediate_node, target_number])
 						res = response.add_subgraph(subgraph.nodes(data=True), subgraph.edges(data=True),
 											"%s and %s are connected by the relationship %s" % (
 											source_description, target_description,	relationship_type), 1, return_result=True)
 						res.essence = "%s" % target_description  # populate with essence of question result
 						row_data = []  # initialize the row data
 						row_data.append("%s" % source_description)
-						row_data.append("%s" % g.node[source_node_number]['properties']['id'])
+						row_data.append("%s" % g.node[source]['properties']['id'])
 						row_data.append("%s" % target_description)
 						row_data.append("%s" % g.node[target_number]['properties']['id'])
 						res.row_data = row_data
