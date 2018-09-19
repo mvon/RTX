@@ -3,6 +3,7 @@
 import os
 import sys
 import argparse
+import ast
 # PyCharm doesn't play well with relative imports + python console + terminal
 try:
 	from code.reasoningtool import ReasoningUtilities as RU
@@ -288,17 +289,70 @@ class SMEDrugRepurposingFisher:
 
 		# sort by the path weight
 		graph_weight_tuples.sort(key=lambda x: x[1])
+		graph_weight_tuples = [(graph, weight, drug_id, disease_id, disease_description) for graph, weight, drug_id in graph_weight_tuples]
+		return graph_weight_tuples
 
+		
+	@staticmethod
+	def describe():
+		output = "Answers questions of the form: 'What are some potential treatments for $disease?'" + "\n"
+		# TODO: subsample disease nodes
+		return output
+
+
+def main():
+	parser = argparse.ArgumentParser(description="Answers questions of the form: 'What are some potential treatments for $disease?'",
+									formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+	parser.add_argument('-d', '--disease', type=str, help="disease curie ID", default="OMIM:603903")
+	parser.add_argument('-j', '--json', action='store_true', help='Flag specifying that results should be printed in JSON format (to stdout)', default=False)
+	parser.add_argument('--describe', action='store_true', help='Print a description of the question to stdout and quit', default=False)
+	parser.add_argument('--num_show', type=int, help='Maximum number of results to return', default=20)
+
+	# Parse and check args
+	args = parser.parse_args()
+	disease_arg = args.disease
+	use_json = args.json
+	describe_flag = args.describe
+	num_show = args.num_show
+
+	if disease_arg[0] == "[":
+		if "','" not in disease_arg:
+			disease_arg = disease_arg.replace(",", "','").replace("[", "['").replace("]", "']")
+		disease_list = ast.literal_eval(disease_arg)
+		disease_list_strip = []
+		for disease in disease_list:
+			disease_list_strip.append(disease.strip())
+		disease_list = disease_list_strip
+	else:
+		disease_list = [disease_arg]
+
+
+	# Initialize the question class
+	Q = SMEDrugRepurposingFisher()
+
+	if describe_flag:
+		res = Q.describe()
+		print(res)
+	else:
+		# Initialize the response class
+		response = FormatOutput.FormatResponse(6)
+		response.response.table_column_names = ["disease name", "disease ID", "drug name", "drug ID", "confidence"]
+		graph_weight_tuples = []
+		
+		for disease in disease_list:
+			tuples = Q.answer(disease, use_json=use_json, num_show=num_show)
+			graph_weight_tuples += tuples
+		
 		# print out the results
 		if not use_json:
-			for graph, weight, drug_id in graph_weight_tuples:
+			for graph, weight, drug_id, disease_id, disease_description in graph_weight_tuples:
 				drug_description = RU.get_node_property(drug_id, "name", node_label="chemical_substance")
 				print("%s %f" % (drug_description, weight))
 		else:
 			response.response.table_column_names = ["disease name", "disease ID", "drug name", "drug ID", "path weight",
 													"drug disease google distance",
 													"ML probability drug treats disease"]
-			for graph, weight, drug_id in graph_weight_tuples:
+			for graph, weight, drug_id, disease_id, disease_description in graph_weight_tuples:
 				drug_description = RU.get_node_property(drug_id, "name", node_label="chemical_substance")
 				drug_id_old_curie = drug_id.replace("CHEMBL.COMPOUND:CHEMBL", "ChEMBL:")
 				# Machine learning probability of "treats"
@@ -327,37 +381,7 @@ class SMEDrugRepurposingFisher:
 				res.row_data = row_data
 			response.print()
 
-	@staticmethod
-	def describe():
-		output = "Answers questions of the form: 'What are some potential treatments for $disease?'" + "\n"
-		# TODO: subsample disease nodes
-		return output
 
-
-def main():
-	parser = argparse.ArgumentParser(description="Answers questions of the form: 'What are some potential treatments for $disease?'",
-									formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-	parser.add_argument('-d', '--disease', type=str, help="disease curie ID", default="OMIM:603903")
-	parser.add_argument('-j', '--json', action='store_true', help='Flag specifying that results should be printed in JSON format (to stdout)', default=False)
-	parser.add_argument('--describe', action='store_true', help='Print a description of the question to stdout and quit', default=False)
-	parser.add_argument('--num_show', type=int, help='Maximum number of results to return', default=20)
-
-	# Parse and check args
-	args = parser.parse_args()
-	disease_id = args.disease
-	use_json = args.json
-	describe_flag = args.describe
-	num_show = args.num_show
-
-
-	# Initialize the question class
-	Q = SMEDrugRepurposingFisher()
-
-	if describe_flag:
-		res = Q.describe()
-		print(res)
-	else:
-		Q.answer(disease_id, use_json=use_json, num_show=num_show)
 
 
 if __name__ == "__main__":
