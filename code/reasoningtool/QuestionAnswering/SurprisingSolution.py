@@ -1,4 +1,3 @@
-# This script will return X that are similar to Y based on high Jaccard index of common one-hop nodes Z (X<->Z<->Y)
 
 import os
 import sys
@@ -35,8 +34,8 @@ class SurprisingSolution:
 	@staticmethod
 	def answer(drug_id, use_json=False, num_show=20, rev=True, conservative=True):
 		"""
-		Answers the question 'what diseases is $drug indicated for?'
-		:param disease_id: KG disease node name
+		Answers the question 'What conditions appear less often than expected when taking $chemical_substance?'
+		:param drug_id: KG drug node curie id
 		:param use_json: bool, use JSON output
 		:param num_show: int, number to display
 		:param rev: bool. If true - order by most likely contraindicated
@@ -168,7 +167,7 @@ class SurprisingSolution:
 			for id in ids_sorted_top_n:
 				if id_to_KG_name[id] is not None:
 					to_print = "According to the Columbia Open Health Data, when %s is used to treat patients, the condition %s is seen with much %s frequency than expected " \
-							   "(log ratio = %f)." % (
+								"(log ratio = %f)." % (
 					drug_description, id_to_name[id], more_less, id_to_frequency[id])
 					nodes = []
 					disease_node_info = id_to_info[id]
@@ -185,7 +184,7 @@ class SurprisingSolution:
 					response.add_subgraph(nodes, edges, to_print, id_to_frequency[id])
 				else:
 					to_print = "According to the Columbia Open Health Data, when %s is used to treat patients, the condition %s is seen with much %s frequency than expected " \
-							   "(log ratio = %f). This condition could not be mapped to any condition in our " \
+								"(log ratio = %f). This condition could not be mapped to any condition in our " \
 							"Knowledge graph, so no graph is shown." % (
 						drug_description, id_to_name[id], more_less, id_to_frequency[id])
 					g = RU.get_node_as_graph(drug_id)
@@ -203,7 +202,7 @@ def main():
 	parser = argparse.ArgumentParser(description="Answers questions of the form: 'What conditions appear less often than expected when taking $drug?'",
 									formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 	parser.add_argument('-d', '--drug', type=str, help="drug ID/name", default="CHEMBL154")
-	parser.add_argument('-r', '--rare', action='store_true', help="Include if you want the least common diseases, don't include if you want the most common")
+	parser.add_argument('-r', '--reverse', action='store_true', help="Include if you want the least common diseases, don't include if you want the most common")
 	parser.add_argument('-c', '--conservative', action='store_true', help="Include if you want exact matches to drug name (so excluding combo drugs)")
 	parser.add_argument('-j', '--json', action='store_true', help='Flag specifying that results should be printed in JSON format (to stdout)', default=False)
 	parser.add_argument('--describe', action='store_true', help='Print a description of the question to stdout and quit', default=False)
@@ -212,7 +211,7 @@ def main():
 	# Parse and check args
 	args = parser.parse_args()
 	drug_id = args.drug
-	is_rare = args.rare
+	is_rare = args.reverse
 	is_conservative = args.conservative
 	use_json = args.json
 	describe_flag = args.describe
