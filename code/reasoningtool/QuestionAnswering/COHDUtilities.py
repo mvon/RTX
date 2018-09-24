@@ -87,12 +87,14 @@ class COHDUtilities:
 		:param drug_description: string (eg. 'Naproxen')
 		:param conservative: bool (True= use exact matching for mapping drug to COHD, False = use all synonyms returned by COHD)
 		:return: dictionary of dictionaries (eg. keys are concept IDs, values look like:
-		{'concept_2_id': 134736,
-		  'associated_2_name': 'Backache',
+		{'concept_id_2': 134736,
+		  'concept_2_name': 'Backache',
+		'concept_2_domain': 'Condition',
 		'observed_count': 200,
 		'expected_count': 100,
-		'concept_': 0.69314718056,
-		'concept_1_id': 1115008}
+		'ln_ratio': 0.69314718056,
+		'dataset_id': 3,
+		'concept_id_1': 1115008}
 		"""
 
 		# Get the concept ID of the drug
