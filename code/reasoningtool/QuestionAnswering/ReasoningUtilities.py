@@ -695,7 +695,7 @@ def get_node_as_graph(node_name, debug=False, use_description=False):
     if use_description:
         query = "MATCH (n{name:'%s'}) return n" % node_name
     else:
-        query = "MATCH (n{id:'%s'}) return n" % node_name
+        query = "MATCH (n{rtx_name:'%s'}) return n" % node_name
     if debug:
         return query
 
@@ -1583,6 +1583,25 @@ def top_n_fisher_exact(id_list, id_node_label, target_node_label, rel_type=None,
             break
     return (res_dict, selected)
 
+
+def does_connect(source_list, source_type, target_type):
+    """
+    Answers the questions: Does any of the elements of 'source_list' connect directly to any element of 'target_type'
+    :param source_list: list of ids
+    :param source_type: label for node of elements in list
+    :param target_type: label for node of target
+    :return: 
+    """
+    query = "MATCH (s:%s)-[]-(t:%s)" \
+            " WHERE s.id in %s return count(t)" % (
+                source_type, target_type, str(source_list))
+    result = session.run(query)
+    out = result.single()["count(t)"]
+    if out > 0:
+        return 1
+    else:
+        return 0
+
 ############################################################################################
 # Stopping point 3/22/18 DK
 
@@ -1811,7 +1830,6 @@ def refine_omims_Markov_chain(omim_list, doid, max_path_len=3, verbose=False):
     if verbose:
         print("Found %d omims (according to the Markov chain model)" % len(selected_omims))
     return selected_omims, paths_dict_selected, selected_probs
-
 ###################################################################
 # Tests
 
