@@ -58,3 +58,4 @@ Q59	true	Which proteins are expressed in cytoplasm?
 Q63	true	Which pathways does gastrin participate in?
 Q101	true	What conditions appear less often than expected when taking Naproxen?
 Q102	true	While taking Naproxen which conditions occur more frequently than expected?
+Q103	true	Which pathways are most enriched by [PCNA,WRN,RMI1,RMI2]?

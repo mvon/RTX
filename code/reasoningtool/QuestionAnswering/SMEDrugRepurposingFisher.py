@@ -43,14 +43,14 @@ class SMEDrugRepurposingFisher:
 		None
 
 	@staticmethod
-	def answer(disease_id, use_json=False, num_show=20):
+	def answer(disease_id, use_json=False, num_show=25):
 
-		num_input_disease_symptoms = 15  # number of representative symptoms of the disease to keep
+		num_input_disease_symptoms = 25  # number of representative symptoms of the disease to keep
 		num_omim_keep = 25  # number of genetic conditions to keep
 		num_protein_keep = 25  # number of implicated proteins to keep
 		num_pathways_keep = 25  # number of pathways to keep
 		num_pathway_proteins_selected = 25  # number of proteins enriched for the above pathways to select
-		num_drugs_keep = 25  # number of drugs that target those proteins to keep
+		num_drugs_keep = num_show  # number of drugs that target those proteins to keep
 		num_paths = 2  # number of paths to keep for each drug selected
 
 		# Initialize the response class
@@ -380,8 +380,6 @@ def main():
 				row_data.append("%f" % prob)
 				res.row_data = row_data
 			response.print()
-
-
 
 
 if __name__ == "__main__":
